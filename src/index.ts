@@ -1,3 +1,5 @@
-export function sum(a: number, b: number) {
-  return a + b;
+import ReduxModule from './ReduxModule'
+
+export default {
+  ReduxModule
 }
