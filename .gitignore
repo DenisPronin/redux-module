@@ -1,3 +1,8 @@
 .idea
 node_modules
 lib
+
+examples/basic/node_modules
+examples/basic/npm-debug.log*
+examples/basic/yarn-debug.log*
+examples/basic/yarn-error.log*
