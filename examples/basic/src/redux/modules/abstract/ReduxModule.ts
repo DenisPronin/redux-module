@@ -94,8 +94,8 @@ class ReduxModule {
   
   setInReducer (path: string) {
     return (state: CombinedState<any>, action: any) => {
-      const pathArr = this._parsePath(path, action.payload)
-      return _flow(_set(pathArr, action.payload))(state);
+      const pathArr = this._parsePath(path, action.payload);
+      return _flow(_set(pathArr, action.payload.value))(state);
     }
   }
   

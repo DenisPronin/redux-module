@@ -11,7 +11,10 @@ class Counter extends ReduxModule {
       value: 0,
       data: {
         flag: false,
-        value: 0
+        value: {
+          val: 0,
+          varVal: 0
+        }
       }
     };
   }
@@ -23,11 +26,13 @@ class Counter extends ReduxModule {
       }, 1000);
     };
     
-    const setPathValue = this.setIn('setPathValue', 'data.value');
+    const setPathValue = this.setIn('setPathValue', 'data.value.val');
+    const setVarPathValue = this.setIn('setVarPathValue', 'data.value.{field}');
     
     return {
       incrementAsync,
-      setPathValue
+      setPathValue,
+      setVarPathValue
     };
   }
   
@@ -65,7 +70,8 @@ export const {
   incrementByAmount,
   decrement,
   incrementAsync,
-  setPathValue
+  setPathValue,
+  setVarPathValue
 } = counter.actions;
 
 export default counter;
