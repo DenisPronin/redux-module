@@ -1,16 +1,12 @@
-import { AnyAction } from "redux";
+import { ActionCreator, ActionCreatorsMapObject, AnyAction, CombinedState, Reducer, ReducersMapObject } from "redux";
 import { reduceReducers } from "./createReducer";
-
-interface IReducers {
-  [actionName: string]: () => {};
-}
 
 class ReduxModule {
   
   namespace: string = '';
-  actions: any = {}
-  reducers: any = {}
-  initialState = {}
+  actions: ActionCreatorsMapObject = {}
+  reducers: Reducer = () => {}
+  initialState: CombinedState<any> = {}
   
   constructor () {
     this.namespace = `[${this.constructor.name}]`;
@@ -19,33 +15,48 @@ class ReduxModule {
   init () {
     this.initialState = this.getInitialState();
     
-    this.actions = {
-      ...this.actions,
-      ...this.defineActions()
-    };
+    this.actions = this.defineActions();
     
     this.reducers = this.initReducers();
   }
   
-  getInitialState () {
+  getInitialState (): CombinedState<any> {
     return {};
   }
   
-  defineActions () {
+  defineActions (): ActionCreatorsMapObject {
     return {};
   }
   
-  defineReducers () {
+  defineReducers (): ReducersMapObject {
     return {};
   }
   
-  initReducers () {
+  ns (actionName: string): string {
+    return `${this.namespace} ${actionName}`;
+  }
+  
+  createAction (actionName: string): ActionCreator<AnyAction> {
+    const type = this.ns(actionName);
+    
+    function actionCreator (...args: any[]): AnyAction {
+      const action: AnyAction = { type };
+      
+      action.payload = args[0];
+      
+      return action;
+    }
+    
+    return actionCreator;
+  }
+  
+  initReducers (): Reducer {
     const reducers = this.addNamespaceToReducers(this.defineReducers());
     return this.createReducers(reducers)
   }
   
-  addNamespaceToReducers (reducers: IReducers) {
-    const result: IReducers = {};
+  addNamespaceToReducers (reducers: ReducersMapObject): ReducersMapObject {
+    const result: ReducersMapObject = {};
     
     Object.keys(reducers).forEach((actionName: string) => {
       result[this.ns(actionName)] = reducers[actionName]
@@ -54,25 +65,7 @@ class ReduxModule {
     return result
   }
   
-  ns (actionName: string): string {
-    return `${this.namespace} ${actionName}`;
-  }
-  
-  createAction (actionName: string) {
-    const type = this.ns(actionName);
-  
-    function actionCreator (...args: any[]): AnyAction {
-      const action: AnyAction = { type };
-    
-      action.payload = args[0];
-    
-      return action;
-    }
-  
-    return actionCreator;
-  }
-  
-  createReducers (reducers: IReducers) {
+  createReducers (reducers: ReducersMapObject): Reducer {
     const _reducers = Object.keys(reducers).map(type => {
       return this.createReducer(type, reducers[type]);
     });
@@ -81,7 +74,7 @@ class ReduxModule {
     return (state = this.initialState, action: any) => reducer(state, action);
   }
   
-  createReducer (type: string, reducer: any) {
+  createReducer (type: string, reducer: Reducer): Reducer {
     return (state = this.initialState, action: any) => {
       const { type: actionType } = action;
       if (!actionType || actionType !== type) {
