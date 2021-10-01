@@ -1,10 +1,13 @@
 import { ActionCreator, ActionCreatorsMapObject, AnyAction, CombinedState, Reducer, ReducersMapObject } from "redux";
 import { reduceReducers } from "./createReducer";
+import _flow from "lodash/fp/flow";
+import _set from "lodash/fp/set";
 
 class ReduxModule {
   
   namespace: string = '';
   actions: ActionCreatorsMapObject = {}
+  reducersFromActions: ReducersMapObject = {};
   reducers: Reducer = () => {}
   initialState: CombinedState<any> = {}
   
@@ -55,10 +58,13 @@ class ReduxModule {
   }
   
   createReducers (reducers: ReducersMapObject): Reducer {
-    const _reducers = Object.keys(reducers).map((actionName: string) => {
+    const allReducers = Object.assign({}, reducers, this.reducersFromActions);
+    const _reducers = Object.keys(allReducers).map((actionName: string) => {
       const type = this.ns(actionName);
-      this.actions[actionName] = this.createAction(actionName);
-      return this.createReducer(type, reducers[actionName]);
+      if (!this.actions[actionName]) {
+        this.actions[actionName] = this.createAction(actionName);
+      }
+      return this.createReducer(type, allReducers[actionName]);
     });
     
     const reducer = reduceReducers(_reducers, this.initialState);
@@ -74,6 +80,49 @@ class ReduxModule {
   
       return reducer(state, action);
     }
+  }
+  
+  addReducerFromAction (actionName: string, reducerFn: Reducer) {
+    this.reducersFromActions[actionName] = reducerFn;
+  }
+  
+  createHandler (actionName: string, reducerFn: Reducer) {
+    const action = this.createAction(actionName);
+    this.addReducerFromAction(actionName, reducerFn)
+    return action;
+  }
+  
+  setInReducer (path: string) {
+    return (state: CombinedState<any>, action: any) => {
+      const pathArr = this._parsePath(path, action.payload)
+      return _flow(_set(pathArr, action.payload))(state);
+    }
+  }
+  
+  setIn (actionName: string, path: string) {
+    return this.createHandler(actionName, this.setInReducer(path))
+  }
+  
+  /*
+  * Utils
+  * */
+  _paramReg = /\{(.*?)}/g
+  
+  _getPathVars (path: string): any[] {
+    const pathVars: any[] = [];
+    path.split('.').forEach(item => {
+      if (item.match(this._paramReg)) {
+        const field = item.replace(this._paramReg, (match, _field) => _field);
+        pathVars.push(field);
+      }
+    });
+    return pathVars;
+  }
+  
+  _parsePath(path: string, payload: any) {
+    return path.split('.').map(item => {
+      return item.replace(this._paramReg, (match, field) => payload[field])
+    });
   }
 }
 

@@ -1,3 +1,4 @@
+import { Dispatch } from "redux";
 import ReduxModule from "./abstract/ReduxModule";
 
 interface CounterState {
@@ -7,12 +8,27 @@ interface CounterState {
 class Counter extends ReduxModule {
   getInitialState () {
     return {
-      value: 0
+      value: 0,
+      data: {
+        flag: false,
+        value: 0
+      }
     };
   }
   
   defineActions () {
-    return {};
+    const incrementAsync = (value: number) => (dispatch: Dispatch) => {
+      setTimeout(() => {
+        dispatch(this.actions.incrementByAmount(value));
+      }, 1000);
+    };
+    
+    const setPathValue = this.setIn('setPathValue', 'data.value');
+    
+    return {
+      incrementAsync,
+      setPathValue
+    };
   }
   
   defineReducers () {
@@ -44,6 +60,12 @@ class Counter extends ReduxModule {
 const counter = new Counter();
 counter.init();
 
-export const {increment, incrementByAmount, decrement} = counter.actions;
+export const {
+  increment,
+  incrementByAmount,
+  decrement,
+  incrementAsync,
+  setPathValue
+} = counter.actions;
 
 export default counter;
