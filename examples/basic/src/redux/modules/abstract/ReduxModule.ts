@@ -51,23 +51,14 @@ class ReduxModule {
   }
   
   initReducers (): Reducer {
-    const reducers = this.addNamespaceToReducers(this.defineReducers());
-    return this.createReducers(reducers)
-  }
-  
-  addNamespaceToReducers (reducers: ReducersMapObject): ReducersMapObject {
-    const result: ReducersMapObject = {};
-    
-    Object.keys(reducers).forEach((actionName: string) => {
-      result[this.ns(actionName)] = reducers[actionName]
-    });
-    
-    return result
+    return this.createReducers(this.defineReducers())
   }
   
   createReducers (reducers: ReducersMapObject): Reducer {
-    const _reducers = Object.keys(reducers).map(type => {
-      return this.createReducer(type, reducers[type]);
+    const _reducers = Object.keys(reducers).map((actionName: string) => {
+      const type = this.ns(actionName);
+      this.actions[actionName] = this.createAction(actionName);
+      return this.createReducer(type, reducers[actionName]);
     });
     
     const reducer = reduceReducers(_reducers, this.initialState);

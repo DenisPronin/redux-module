@@ -1,8 +1,5 @@
 import ReduxModule from "./abstract/ReduxModule";
 
-const INCREMENT = 'INCREMENT';
-const DECREMENT = 'DECREMENT';
-
 interface CounterState {
   value: number;
 }
@@ -15,25 +12,26 @@ class Counter extends ReduxModule {
   }
   
   defineActions () {
-    const increment = this.createAction(INCREMENT);
-    const decrement = this.createAction(DECREMENT);
-    
-    return {
-      increment,
-      decrement
-    };
+    return {};
   }
   
   defineReducers () {
     return {
-      [INCREMENT]: (state: CounterState, action: any) => {
+      increment: (state: CounterState) => {
+        return {
+          ...state,
+          value: state.value + 1
+        };
+      },
+  
+      incrementByAmount: (state: CounterState, action: any) => {
         return {
           ...state,
           value: state.value + action.payload
         };
       },
-      
-      [DECREMENT]: (state: CounterState) => {
+  
+      decrement: (state: CounterState) => {
         return {
           ...state,
           value: state.value - 1
@@ -45,4 +43,7 @@ class Counter extends ReduxModule {
 
 const counter = new Counter();
 counter.init();
+
+export const {increment, incrementByAmount, decrement} = counter.actions;
+
 export default counter;
