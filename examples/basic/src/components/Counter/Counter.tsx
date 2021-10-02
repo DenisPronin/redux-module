@@ -70,7 +70,7 @@ export function Counter() {
       
       <button
         className={styles.button}
-        onClick={() => dispatch(mergeDataValue({value: { val: 0, varVal: 0 }}))}
+        onClick={() => dispatch(mergeDataValue({value: { val: 0, varVal: 0 }, valueField: 'value'}))}
       >
         merge var value
       </button>

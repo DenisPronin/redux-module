@@ -28,7 +28,7 @@ class Counter extends ReduxModule {
     
     const setPathValue = this.setIn('setPathValue', 'data.value.val');
     const setVarPathValue = this.setIn('setVarPathValue', 'data.{valueField}.{field}');
-    const mergeDataValue = this.mergeIn('mergeDataValue', 'data.value');
+    const mergeDataValue = this.mergeIn('mergeDataValue', 'data.{valueField}');
     
     return {
       incrementAsync,
