@@ -27,12 +27,14 @@ class Counter extends ReduxModule {
     };
     
     const setPathValue = this.setIn('setPathValue', 'data.value.val');
-    const setVarPathValue = this.setIn('setVarPathValue', 'data.value.{field}');
+    const setVarPathValue = this.setIn('setVarPathValue', 'data.{valueField}.{field}');
+    const mergeDataValue = this.mergeIn('mergeDataValue', 'data.value');
     
     return {
       incrementAsync,
       setPathValue,
-      setVarPathValue
+      setVarPathValue,
+      mergeDataValue
     };
   }
   
@@ -71,7 +73,8 @@ export const {
   decrement,
   incrementAsync,
   setPathValue,
-  setVarPathValue
+  setVarPathValue,
+  mergeDataValue
 } = counter.actions;
 
 export default counter;

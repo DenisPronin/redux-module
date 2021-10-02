@@ -6,7 +6,8 @@ import {
   incrementByAmount,
   incrementAsync,
   setPathValue,
-  setVarPathValue
+  setVarPathValue,
+  mergeDataValue
 } from "../../redux/modules/counter";
 import { useAppDispatch, useAppSelector } from "../../redux/store";
 
@@ -59,11 +60,19 @@ export function Counter() {
       </button>
 
       <span className={styles.value}>{varValue}</span>
+      
       <button
         className={styles.button}
-        onClick={() => dispatch(setVarPathValue({value: 5, field: 'varVal'}))}
+        onClick={() => dispatch(setVarPathValue({value: 5, valueField: 'value', field: 'varVal'}))}
       >
         set var value
+      </button>
+      
+      <button
+        className={styles.button}
+        onClick={() => dispatch(mergeDataValue({value: { val: 0, varVal: 0 }}))}
+      >
+        merge var value
       </button>
     </div>
   );
