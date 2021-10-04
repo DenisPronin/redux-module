@@ -130,10 +130,14 @@ class ReduxModule {
     return this.createHandler(actionName, this.toggleInReducer(path))
   }
   
+  resetToInitialState (actionName: string) {
+    return this.createHandler(actionName, () => this.initialState);
+  }
+  
   /*
   * Utils
   * */
-  _paramReg = /\{(.*?)}/g
+  _paramReg = /{(.*?)}/g
   
   _parsePath(path: string, payload: any) {
     return path.split('.').map(item => {

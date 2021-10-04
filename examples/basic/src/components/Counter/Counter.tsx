@@ -8,7 +8,8 @@ import {
   setPathValue,
   setVarPathValue,
   mergeDataValue,
-  toggleFlag
+  toggleFlag,
+  reset
 } from "../../redux/modules/counter";
 import { useAppDispatch, useAppSelector } from "../../redux/store";
 
@@ -88,6 +89,15 @@ export function Counter() {
           onClick={() => dispatch(toggleFlag())}
         >
           toggle
+        </button>
+      </div>
+      
+      <div>
+        <button
+          className={styles.button}
+          onClick={() => dispatch(reset())}
+        >
+          reset
         </button>
       </div>
     </div>

@@ -50,7 +50,7 @@
   cursor: pointer;
   border-radius: 2px;
   transition: all 0.15s;
-  background-color: rgba(211, 45, 15);
+  background-color: rgb(211, 45, 15);
 }
 
 .textbox {

@@ -31,12 +31,15 @@ class Counter extends ReduxModule {
     const mergeDataValue = this.mergeIn('mergeDataValue', 'data.{valueField}');
     const toggleFlag = this.toggleIn('toggleFlag', 'data.flag');
     
+    const reset = this.resetToInitialState('reset');
+    
     return {
       incrementAsync,
       setPathValue,
       setVarPathValue,
       mergeDataValue,
-      toggleFlag
+      toggleFlag,
+      reset
     };
   }
   
@@ -77,7 +80,8 @@ export const {
   setPathValue,
   setVarPathValue,
   mergeDataValue,
-  toggleFlag
+  toggleFlag,
+  reset
 } = counter.actions;
 
 export default counter;
