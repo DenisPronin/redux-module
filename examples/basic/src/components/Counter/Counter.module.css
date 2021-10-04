@@ -37,6 +37,22 @@
   transition: all 0.15s;
 }
 
+.buttonColor {
+  appearance: none;
+  background: none;
+  font-size: 32px;
+  padding-left: 12px;
+  padding-right: 12px;
+  outline: none;
+  border: 2px solid transparent;
+  color: #fff;
+  padding-bottom: 4px;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.15s;
+  background-color: rgba(211, 45, 15);
+}
+
 .textbox {
   font-size: 32px;
   padding: 2px;

@@ -2,6 +2,7 @@ import { ActionCreator, ActionCreatorsMapObject, AnyAction, CombinedState, Reduc
 import { reduceReducers } from "./createReducer";
 import _flow from "lodash/fp/flow";
 import _set from "lodash/fp/set";
+import _get from 'lodash/get';
 import _update from 'lodash/fp/update';
 import _assign from 'lodash/fp/assign';
 
@@ -95,18 +96,25 @@ class ReduxModule {
   }
   
   setInReducer (path: string) {
-    return (state: CombinedState<any>, action: any) => {
+    return (state: CombinedState<any>, action: AnyAction) => {
       const pathArr = this._parsePath(path, action.payload);
       return _flow(_set(pathArr, action.payload.value))(state);
     }
   }
   
   mergeInReducer (path: string) {
-    return (state: CombinedState<any>, action: any) => {
+    return (state: CombinedState<any>, action: AnyAction) => {
       const pathArr = this._parsePath(path, action.payload);
       return _flow(_update(pathArr, (obj) => {
         return _assign(obj, action.payload.value);
       }))(state);
+    }
+  }
+  
+  toggleInReducer (path: string) {
+    return (state: CombinedState<any>, action: AnyAction) => {
+      const pathArr = this._parsePath(path, action.payload);
+      return _flow(_set(pathArr, !_get(state, pathArr)))(state);
     }
   }
   
@@ -116,6 +124,10 @@ class ReduxModule {
   
   mergeIn (actionName: string, path: string) {
     return this.createHandler(actionName, this.mergeInReducer(path))
+  }
+  
+  toggleIn (actionName: string, path: string) {
+    return this.createHandler(actionName, this.toggleInReducer(path))
   }
   
   /*

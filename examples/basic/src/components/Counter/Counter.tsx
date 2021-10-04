@@ -7,7 +7,8 @@ import {
   incrementAsync,
   setPathValue,
   setVarPathValue,
-  mergeDataValue
+  mergeDataValue,
+  toggleFlag
 } from "../../redux/modules/counter";
 import { useAppDispatch, useAppSelector } from "../../redux/store";
 
@@ -16,6 +17,7 @@ export function Counter() {
   const count = useAppSelector(state => state.counter.value);
   const value = useAppSelector(state => state.counter.data.value.val);
   const varValue = useAppSelector(state => state.counter.data.value.varVal);
+  const flag = useAppSelector(state => state.counter.data.flag);
   
   return (
     <div>
@@ -51,29 +53,43 @@ export function Counter() {
         </button>
       </div>
   
-      <span className={styles.value}>{value}</span>
-      <button
-        className={styles.button}
-        onClick={() => dispatch(setPathValue({ value: 5 }))}
-      >
-        set value
-      </button>
-
-      <span className={styles.value}>{varValue}</span>
+      <div>
+        <span className={styles.value}>{value}</span>
+        <button
+          className={styles.button}
+          onClick={() => dispatch(setPathValue({ value: 5 }))}
+        >
+          set value
+        </button>
+  
+        <span className={styles.value}>{varValue}</span>
+  
+        <button
+          className={styles.button}
+          onClick={() => dispatch(setVarPathValue({value: 5, valueField: 'value', field: 'varVal'}))}
+        >
+          set var value
+        </button>
+      </div>
       
-      <button
-        className={styles.button}
-        onClick={() => dispatch(setVarPathValue({value: 5, valueField: 'value', field: 'varVal'}))}
-      >
-        set var value
-      </button>
+      <div>
+        <button
+          className={styles.button}
+          onClick={() => dispatch(mergeDataValue({value: { val: 0, varVal: 0 }, valueField: 'value'}))}
+        >
+          merge var value
+        </button>
+      </div>
       
-      <button
-        className={styles.button}
-        onClick={() => dispatch(mergeDataValue({value: { val: 0, varVal: 0 }, valueField: 'value'}))}
-      >
-        merge var value
-      </button>
+      <div>
+        <button
+          type='button'
+          className={flag ? styles.buttonColor : styles.button}
+          onClick={() => dispatch(toggleFlag())}
+        >
+          toggle
+        </button>
+      </div>
     </div>
   );
 }
