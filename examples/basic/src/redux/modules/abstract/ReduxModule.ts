@@ -13,7 +13,7 @@ import _set from "lodash/fp/set";
 import _get from 'lodash/get';
 import _update from 'lodash/fp/update';
 import _assign from 'lodash/fp/assign';
-import { reduceReducers } from "./createReducer";
+import { reduceReducers } from "./reduceReducers";
 
 interface IThunkOptions {
   actionName: string;
@@ -239,7 +239,7 @@ class ReduxModule {
   
   _parsePath(path: string, payload: any): string[] {
     return path.split('.').map(item => {
-      return item.replace(this._paramReg, (match, field) => payload[field])
+      return item.replace(this._paramReg, (_, field) => payload[field])
     });
   }
 }
