@@ -15,6 +15,14 @@ import _update from 'lodash/fp/update';
 import _assign from 'lodash/fp/assign';
 import { reduceReducers } from "./reduceReducers";
 
+interface IReduxModule {
+  namespace: string;
+  actions: ActionCreatorsMapObject;
+  reducersFromActions: ReducersMapObject;
+  reducers: Reducer;
+  initialState: CombinedState<any>
+}
+
 interface IThunkOptions {
   actionName: string;
   actionMethod: (...args: any[]) => Promise<any>;
@@ -29,7 +37,7 @@ interface IThunkOptions {
   normalize?: (response: any) => any
 }
 
-class ReduxModule {
+class ReduxModule implements IReduxModule {
   
   namespace: string = '';
   actions: ActionCreatorsMapObject = {}
