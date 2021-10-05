@@ -1,10 +1,32 @@
-import { ActionCreator, ActionCreatorsMapObject, AnyAction, CombinedState, Reducer, ReducersMapObject } from "redux";
+import {
+  ActionCreator,
+  ActionCreatorsMapObject,
+  AnyAction,
+  CombinedState,
+  Dispatch,
+  Reducer,
+  ReducersMapObject
+} from "redux";
 import { reduceReducers } from "./createReducer";
 import _flow from "lodash/fp/flow";
 import _set from "lodash/fp/set";
 import _get from 'lodash/get';
 import _update from 'lodash/fp/update';
 import _assign from 'lodash/fp/assign';
+
+interface IThunkOptions {
+  actionName: string;
+  actionMethod: (...args: any[]) => Promise<any>;
+  pendingAction?: ActionCreator<AnyAction>;
+  pendingPath?: string;
+  fulfilledMethod?: 'setIn' | 'mergeIn';
+  fulfilledPath?: string;
+  fulfilledAction?: ActionCreator<AnyAction>;
+  rejectedPath?: string;
+  rejectedAction?: ActionCreator<AnyAction>;
+  serialize?: (args: any[], getState: () => CombinedState<any>) => any[],
+  normalize?: (response: any) => any
+}
 
 class ReduxModule {
   
@@ -85,24 +107,24 @@ class ReduxModule {
     }
   }
   
-  addReducerFromAction (actionName: string, reducerFn: Reducer) {
+  addReducerFromAction (actionName: string, reducerFn: Reducer): void {
     this.reducersFromActions[actionName] = reducerFn;
   }
   
-  createHandler (actionName: string, reducerFn: Reducer) {
+  createHandler (actionName: string, reducerFn: Reducer): ActionCreator<AnyAction> {
     const action = this.createAction(actionName);
     this.addReducerFromAction(actionName, reducerFn)
     return action;
   }
   
-  setInReducer (path: string) {
+  setInReducer (path: string): Reducer {
     return (state: CombinedState<any>, action: AnyAction) => {
       const pathArr = this._parsePath(path, action.payload);
       return _flow(_set(pathArr, action.payload.value))(state);
     }
   }
   
-  mergeInReducer (path: string) {
+  mergeInReducer (path: string): Reducer {
     return (state: CombinedState<any>, action: AnyAction) => {
       const pathArr = this._parsePath(path, action.payload);
       return _flow(_update(pathArr, (obj) => {
@@ -111,27 +133,100 @@ class ReduxModule {
     }
   }
   
-  toggleInReducer (path: string) {
+  toggleInReducer (path: string): Reducer {
     return (state: CombinedState<any>, action: AnyAction) => {
       const pathArr = this._parsePath(path, action.payload);
       return _flow(_set(pathArr, !_get(state, pathArr)))(state);
     }
   }
   
-  setIn (actionName: string, path: string) {
-    return this.createHandler(actionName, this.setInReducer(path))
+  setIn (actionName: string, path: string): ActionCreator<AnyAction> {
+    return this.createHandler(actionName, this.setInReducer(path));
   }
   
-  mergeIn (actionName: string, path: string) {
-    return this.createHandler(actionName, this.mergeInReducer(path))
+  mergeIn (actionName: string, path: string): ActionCreator<AnyAction> {
+    return this.createHandler(actionName, this.mergeInReducer(path));
   }
   
-  toggleIn (actionName: string, path: string) {
-    return this.createHandler(actionName, this.toggleInReducer(path))
+  toggleIn (actionName: string, path: string): ActionCreator<AnyAction> {
+    return this.createHandler(actionName, this.toggleInReducer(path));
   }
   
-  resetToInitialState (actionName: string) {
+  resetToInitialState (actionName: string): ActionCreator<AnyAction> {
     return this.createHandler(actionName, () => this.initialState);
+  }
+  
+  thunkAction (options: IThunkOptions) {
+    const {
+      actionName,
+      actionMethod,
+      pendingAction,
+      pendingPath,
+      fulfilledMethod = 'setIn',
+      fulfilledPath = '',
+      fulfilledAction = null,
+      rejectedPath = '',
+      rejectedAction = null,
+      serialize,
+      normalize
+    } = options;
+    
+    let _pendingAction = pendingAction;
+    if (pendingPath) {
+      _pendingAction = this.setIn(`${actionName} pending`, pendingPath);
+    }
+  
+    let _fulfilledAction = fulfilledAction;
+    if (fulfilledPath) {
+      _fulfilledAction = this[fulfilledMethod](`${actionName} fulfilled`, fulfilledPath);
+    }
+  
+    let _rejectedAction = rejectedAction;
+    if (rejectedPath) {
+      _rejectedAction = this.setIn(`${actionName} rejected`, rejectedPath);
+    }
+  
+    return (...args: any) => (dispatch: Dispatch, getState: () => CombinedState<any>) => {
+      let methodOptions = args;
+      if (serialize) {
+        methodOptions = serialize(methodOptions, getState);
+      }
+      
+      if (_pendingAction) {
+        dispatch(_pendingAction({ value: true }));
+      }
+  
+      return actionMethod(...methodOptions)
+        .then((_response: any) => {
+          let response = _response;
+          if (normalize) {
+            response = normalize(response);
+          }
+          
+          if (_fulfilledAction) {
+            dispatch(_fulfilledAction({ value: response, options: methodOptions }));
+          }
+          
+          if (_pendingAction) {
+            dispatch(_pendingAction({ value: false }));
+          }
+          
+          return response
+        })
+        .catch((error: any) => {
+          console.error('Error in thunkAction()', error);
+          
+          if (_rejectedAction) {
+            dispatch(_rejectedAction({ value: error, options: methodOptions }));
+          }
+      
+          if (_pendingAction) {
+            dispatch(_pendingAction({ value: false }));
+          }
+          
+          throw error;
+        });
+    }
   }
   
   /*

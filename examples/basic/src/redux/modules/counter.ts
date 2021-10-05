@@ -1,5 +1,6 @@
 import { Dispatch } from "redux";
 import ReduxModule from "./abstract/ReduxModule";
+import githubApi from "../../api/githubApi";
 
 interface CounterState {
   value: number;
@@ -15,6 +16,11 @@ class Counter extends ReduxModule {
           val: 0,
           varVal: 0
         }
+      },
+      user: {
+        isPending: false,
+        data: null,
+        error: ''
       }
     };
   }
@@ -33,13 +39,23 @@ class Counter extends ReduxModule {
     
     const reset = this.resetToInitialState('reset');
     
+    const getUser = this.thunkAction({
+      actionName: 'getUser',
+      actionMethod: githubApi.getUser,
+      pendingPath: 'user.isPending',
+      fulfilledMethod: 'setIn',
+      fulfilledPath: 'user.data',
+      normalize: (response) => response.data
+    })
+    
     return {
       incrementAsync,
       setPathValue,
       setVarPathValue,
       mergeDataValue,
       toggleFlag,
-      reset
+      reset,
+      getUser
     };
   }
   
@@ -81,7 +97,8 @@ export const {
   setVarPathValue,
   mergeDataValue,
   toggleFlag,
-  reset
+  reset,
+  getUser
 } = counter.actions;
 
 export default counter;

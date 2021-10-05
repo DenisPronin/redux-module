@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styles from './Counter.module.css';
 import {
   decrement,
@@ -9,7 +9,8 @@ import {
   setVarPathValue,
   mergeDataValue,
   toggleFlag,
-  reset
+  reset,
+  getUser
 } from "../../redux/modules/counter";
 import { useAppDispatch, useAppSelector } from "../../redux/store";
 
@@ -19,6 +20,10 @@ export function Counter() {
   const value = useAppSelector(state => state.counter.data.value.val);
   const varValue = useAppSelector(state => state.counter.data.value.varVal);
   const flag = useAppSelector(state => state.counter.data.flag);
+  
+  useEffect(() => {
+    dispatch(getUser('DenisPronin'));
+  }, [dispatch]);
   
   return (
     <div>
