@@ -7,12 +7,13 @@ import {
   Reducer,
   ReducersMapObject
 } from "redux";
-import { reduceReducers } from "./createReducer";
+import { ThunkAction } from "redux-thunk";
 import _flow from "lodash/fp/flow";
 import _set from "lodash/fp/set";
 import _get from 'lodash/get';
 import _update from 'lodash/fp/update';
 import _assign from 'lodash/fp/assign';
+import { reduceReducers } from "./createReducer";
 
 interface IThunkOptions {
   actionName: string;
@@ -156,7 +157,9 @@ class ReduxModule {
     return this.createHandler(actionName, () => this.initialState);
   }
   
-  thunkAction (options: IThunkOptions) {
+  thunkAction (options: IThunkOptions): ActionCreator<
+    ThunkAction<Promise<AnyAction>, CombinedState<any>, void, AnyAction>
+  > {
     const {
       actionName,
       actionMethod,
@@ -234,7 +237,7 @@ class ReduxModule {
   * */
   _paramReg = /{(.*?)}/g
   
-  _parsePath(path: string, payload: any) {
+  _parsePath(path: string, payload: any): string[] {
     return path.split('.').map(item => {
       return item.replace(this._paramReg, (match, field) => payload[field])
     });
