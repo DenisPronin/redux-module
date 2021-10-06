@@ -1,5 +1,5 @@
 import { Dispatch } from "redux";
-import ReduxModule from "./abstract/ReduxModule";
+import ReduxModule from "redux-module-wrapper";
 import githubApi from "../../api/githubApi";
 
 interface CounterState {
@@ -7,6 +7,7 @@ interface CounterState {
 }
 
 class Counter extends ReduxModule {
+
   getInitialState () {
     return {
       value: 0,

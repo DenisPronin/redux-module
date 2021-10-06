@@ -9423,9 +9423,9 @@ redent@^3.0.0:
     strip-indent "^3.0.0"
 
 redux-module-wrapper@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/redux-module-wrapper/-/redux-module-wrapper-1.0.0.tgz#4830d819d3fdb2780372782e9b5ff87e2a5d465a"
-  integrity sha512-09WcuXps6aFjph7CpQoxbc4/6z+7guXU5acyvOsEYSINbUjA/s+lfcLrvBSW6l9mndJ6q30B63bF7WLc8RlbXQ==
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/redux-module-wrapper/-/redux-module-wrapper-1.0.1.tgz#21df4e677daece23abefcc3b8503b95c6bbed237"
+  integrity sha512-5zrRz+5OvutxP+MKcULas+ZjTYsxQp2ERJcPugFpNysenZ7p/WIqp2syI4A/l9WMZ0tl7F0k+iYWdK4pgVZ4CQ==
   dependencies:
     "@types/lodash" "^4.14.175"
     lodash "^4.17.21"
