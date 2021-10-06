@@ -1,3 +1,5 @@
-import ReduxModule from './ReduxModule'
+import ReduxModule, { IShortAction } from './ReduxModule';
+
+export { IShortAction };
 
 export default ReduxModule;
