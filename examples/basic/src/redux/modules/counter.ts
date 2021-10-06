@@ -1,5 +1,5 @@
 import { Dispatch } from "redux";
-import ReduxModule from "redux-module-wrapper";
+import ReduxModule, { IShortAction } from "./abstract/ReduxModule";
 import githubApi from "../../api/githubApi";
 
 interface CounterState {
@@ -33,11 +33,6 @@ class Counter extends ReduxModule {
       }, 1000);
     };
     
-    const setPathValue = this.setIn('setPathValue', 'data.value.val');
-    const setVarPathValue = this.setIn('setVarPathValue', 'data.{valueField}.{field}');
-    const mergeDataValue = this.mergeIn('mergeDataValue', 'data.{valueField}');
-    const toggleFlag = this.toggleIn('toggleFlag', 'data.flag');
-    
     const reset = this.resetToInitialState('reset');
     
     const getUser = this.thunkAction({
@@ -47,14 +42,14 @@ class Counter extends ReduxModule {
       fulfilledMethod: 'setIn',
       fulfilledPath: 'user.data',
       normalize: (response) => response.data
-    })
+    });
     
     return {
       incrementAsync,
-      setPathValue,
-      setVarPathValue,
-      mergeDataValue,
-      toggleFlag,
+      setPathValue: { method: 'setIn', path: 'data.value.val' } as IShortAction,
+      setVarPathValue: { method: 'setIn', path: 'data.{valueField}.{field}' } as IShortAction,
+      mergeDataValue: { method: 'mergeIn', path: 'data.{valueField}' } as IShortAction,
+      toggleFlag: { method: 'toggleIn', path: 'data.flag' } as IShortAction,
       reset,
       getUser
     };

@@ -18,9 +18,29 @@ import { reduceReducers } from "./reduceReducers";
 interface IReduxModule {
   namespace: string;
   actions: ActionCreatorsMapObject;
-  reducersFromActions: ReducersMapObject;
   reducers: Reducer;
-  initialState: CombinedState<any>
+  initialState: CombinedState<any>;
+  init: () => void;
+  getInitialState: () => CombinedState<any>;
+  defineActions: () => IActions;
+  defineReducers: () => ReducersMapObject;
+  createAction: (actionName: string) => ActionCreator<AnyAction>;
+  setIn: (actionName: string, path: string) => ActionCreator<AnyAction>;
+  mergeIn: (actionName: string, path: string) => ActionCreator<AnyAction>;
+  toggleIn: (actionName: string, path: string) => ActionCreator<AnyAction>;
+  resetToInitialState: (actionName: string) => ActionCreator<AnyAction>;
+  thunkAction (options: IThunkOptions): ActionCreator<
+    ThunkAction<Promise<AnyAction>, CombinedState<any>, void, AnyAction>
+  >;
+}
+
+export interface IShortAction {
+  method: 'setIn' | 'mergeIn' | 'toggleIn';
+  path: string;
+}
+
+interface IActions<A = any> {
+  [key: string]: ActionCreator<A> | IShortAction;
 }
 
 interface IThunkOptions {
@@ -49,10 +69,10 @@ class ReduxModule implements IReduxModule {
     this.namespace = `[${this.constructor.name}]`;
   }
   
-  init () {
+  init (): void {
     this.initialState = this.getInitialState();
     
-    this.actions = this.defineActions();
+    this.actions = this.initActions();
     
     this.reducers = this.initReducers();
   }
@@ -61,7 +81,7 @@ class ReduxModule implements IReduxModule {
     return {};
   }
   
-  defineActions (): ActionCreatorsMapObject {
+  defineActions (): IActions {
     return {};
   }
   
@@ -85,6 +105,23 @@ class ReduxModule implements IReduxModule {
     }
     
     return actionCreator;
+  }
+  
+  initActions (): ActionCreatorsMapObject {
+    const actions = this.defineActions();
+    
+    const actionCreators: ActionCreatorsMapObject = {};
+    
+    Object.keys(actions).forEach((actionName: string) => {
+      let action = actions[actionName];
+      if (typeof action === 'object') {
+        action = this[action.method](actionName, action.path);
+      }
+  
+      actionCreators[actionName] = action;
+    });
+    
+    return actionCreators;
   }
   
   initReducers (): Reducer {
