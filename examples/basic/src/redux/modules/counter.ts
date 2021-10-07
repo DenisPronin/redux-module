@@ -1,5 +1,5 @@
 import { Dispatch } from "redux";
-import ReduxModule, { IShortAction } from "./abstract/ReduxModule";
+import ReduxModule, { IShortAction } from "redux-module-wrapper";
 import githubApi from "../../api/githubApi";
 
 interface CounterState {
